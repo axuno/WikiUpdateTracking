@@ -1,11 +1,9 @@
 name: Check Wiki Updates
-
 on:
   workflow_dispatch: # Allows manual trigger
   # push: # Uncomment to run on push
   schedule:
     - cron: '0 0 * * *' # Runs once a day
-
 jobs:
   check-wiki:
     if: ${{ github.repository == 'axuno/WikiUpdateTracking' }}
@@ -16,7 +14,6 @@ jobs:
         with:
           repository: ${{ github.repository }}.wiki
           path: wiki  # Checkout wiki to wiki folder
-
       - name: Get last commit date, message and number of commits
         id: get-info
         run: |
@@ -25,16 +22,13 @@ jobs:
             FORMATTED_DATE=$(date -d"$DATE" +'%Y-%m-%d %H:%M:%S')
             echo "updatedOn=$FORMATTED_DATE" >> $GITHUB_ENV
             # The :a;N;$!ba; part buffers the input to ensure that all newline characters are replaced, not just those at the end of each line read
-            # printf "commitMessage=\"%s\"\n" "$(git log -1 --pretty=%B | sed ':a;N;$!ba;s/\n/ ↲ /g' | sed "s/'/\\\\'/g")" >> $GITHUB_ENV
-            COMMIT_MSG="$(git log -1 --pretty=%B)"
-            SPLIT_MSG=$(echo "$COMMIT_MSG" | awk -v RS="" '{gsub(/\n/,"<br/>"); print}')
-            echo "::set-output name=split_msg::$SPLIT_MSG"
+            printf "commitMessage=\"%s\"\n" "$(git log -1 --pretty=%B | awk -v RS="" '{gsub(/\n/,"<br/>"); print}' | sed "s/'/\\\\'/g")" >> $GITHUB_ENV
             echo "hash=$(git rev-parse HEAD)" >> $GITHUB_ENV
             echo "commitCount=$(git rev-list --count --since='24 hours ago' HEAD)" >> $GITHUB_ENV
       - name: Print variables
         run: |
           echo ${{ env.updatedOn }}
-          echo ${{ steps.replace.outputs.split_msg }}
+          echo "${{ env.commitMessage }}"
           echo ${{ env.hash }}
           echo ${{ env.commitCount }}
       - name: Checkout main repo
@@ -51,7 +45,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.WIKI_CHECK_TOKEN }}
           UpdatedOn: ${{ env.updatedOn }}
-          CommitMessage: ${{ steps.replace.outputs.split_msg }}
+          CommitMessage: ${{ env.commitMessage }}
           CommitCount: ${{ env.commitCount }}
           Hash: ${{ env.hash }}
         with:
