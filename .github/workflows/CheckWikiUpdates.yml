@@ -34,7 +34,7 @@ jobs:
       - name: Print variables
         run: |
           echo ${{ env.updatedOn }}
-          echo $SPLIT_MSG
+          echo ${{ steps.replace.outputs.split_msg }}
           echo ${{ env.hash }}
           echo ${{ env.commitCount }}
       - name: Checkout main repo
