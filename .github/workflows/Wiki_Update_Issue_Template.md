@@ -15,4 +15,4 @@ These are the details of the latest commit:
 |:---|:---|
 | Date | {{ env.UpdatedOn }} |
 | Hash | [{{ env.Hash }}](https://github.com/axuno/SmartFormat/wiki/_compare/{{ env.Hash }}) |
-| Message | {{ env.CommitMessage }} |
+| Message | {{ env.commitMessage | replace: '↲', '<br/>' }} |
