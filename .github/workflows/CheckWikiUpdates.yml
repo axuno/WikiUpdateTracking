@@ -26,7 +26,7 @@ jobs:
             echo "updatedOn=$FORMATTED_DATE" >> $GITHUB_ENV
             # The :a;N;$!ba; part buffers the input to ensure that all newline characters are replaced, not just those at the end of each line read
             # printf "commitMessage=\"%s\"\n" "$(git log -1 --pretty=%B | sed ':a;N;$!ba;s/\n/ ↲ /g' | sed "s/'/\\\\'/g")" >> $GITHUB_ENV
-            printf "commitMessage=\"%s\"\n" "$(git log -1 --pretty=%B | sed ':a;N;$!ba;s/\n/"<br/>"/g' | sed "s/'/\\\\'/g")" >> $GITHUB_ENV
+            printf "commitMessage=\"%s\"\n" "$(git log -1 --pretty=%B | awk -v RS="" '{gsub(/\n/,"<br/>"); print}' | sed "s/'/\\\\'/g")" >> $GITHUB_ENV
             echo "hash=$(git rev-parse HEAD)" >> $GITHUB_ENV
             echo "commitCount=$(git rev-list --count --since='24 hours ago' HEAD)" >> $GITHUB_ENV
       - name: Print variables
