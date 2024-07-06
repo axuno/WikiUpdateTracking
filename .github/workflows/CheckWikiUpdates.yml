@@ -1,9 +1,11 @@
 name: Check Wiki Updates
+
 on:
   workflow_dispatch: # Allows manual trigger
   # push: # Uncomment to run on push
   schedule:
     - cron: '0 0 * * *' # Runs once a day
+
 jobs:
   check-wiki:
     if: ${{ github.repository == 'axuno/WikiUpdateTracking' }}
@@ -14,6 +16,7 @@ jobs:
         with:
           repository: ${{ github.repository }}.wiki
           path: wiki  # Checkout wiki to wiki folder
+
       - name: Get last commit date, message and number of commits
         id: get-info
         run: |
@@ -22,7 +25,7 @@ jobs:
             FORMATTED_DATE=$(date -d"$DATE" +'%Y-%m-%d %H:%M:%S')
             echo "updatedOn=$FORMATTED_DATE" >> $GITHUB_ENV
             # The :a;N;$!ba; part buffers the input to ensure that all newline characters are replaced, not just those at the end of each line read
-            printf "commitMessage=\"%s\"\n" "$(printf "%q" "$(git log -1 --pretty=%B | awk -v RS="" '{gsub(/\n/,"<br/>"); print}')")" >> $GITHUB_ENV
+            printf "commitMessage=\"%s\"\n" "$(git log -1 --pretty=%B | sed ':a;N;$!ba;s/\n/ ↲ /g' | sed "s/'/\\\\'/g")" >> $GITHUB_ENV
             echo "hash=$(git rev-parse HEAD)" >> $GITHUB_ENV
             echo "commitCount=$(git rev-list --count --since='24 hours ago' HEAD)" >> $GITHUB_ENV
       - name: Print variables
